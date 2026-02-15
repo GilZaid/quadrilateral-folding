@@ -146,7 +146,7 @@ if mode == "Plot Orbit":
                 else:
                     html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
                 
-                st.components.v1.html(html_anim, height=700, scrolling=True)  # CHANGED: removed .data
+                st.components.v1.html(html_anim, height=700, scrolling=True)
 
 else:  # Animate Folding
     st.header("Folding Animation")
@@ -178,7 +178,7 @@ else:  # Animate Folding
                 else:
                     html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
                 
-                st.components.v1.html(html_anim.data, height=700, scrolling=True)
+                st.components.v1.html(html_anim, height=700, scrolling=True)
 
 # Info section
 with st.expander("ℹ️ About the Folding Map"):
