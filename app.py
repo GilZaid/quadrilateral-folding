@@ -44,6 +44,43 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     
     return fig
 
+else:  # Animate Folding
+    st.header("Folding Animation")
+    
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        iters = st.slider("Animation Iterations", 1, 100, 20, 1)
+        duration = st.slider("Frame Duration (ms)", 50, 2000, 200, 50)
+        pointsize = st.slider("Point Size", 1, 20, 2, 1)
+        
+        st.subheader("Orbit Background")
+        orbit = st.checkbox("Show Orbit Background", value=False)
+        
+        # Initialize defaults
+        iters_orbit = 1000
+        alpha_orbit = 0.3
+        color_orbit = "#0000FF"
+        
+        if orbit:
+            iters_orbit = st.slider("Orbit Iterations", 100, 5000, 1000, 100)
+            alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05)
+            color_orbit = st.color_picker("Orbit Color", "#0000FF")
+        
+        generate = st.button("Generate Animation", type="primary")
+    
+    with col2:
+        if generate:
+            with st.spinner("Generating animation... This may take a moment."):
+                if orbit:
+                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
+                                               pointsize, orbit, iters_orbit, 
+                                               alpha_orbit, color_orbit)
+                else:
+                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
+                
+                st.components.v1.html(html_anim, height=700, scrolling=True)
+
 def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2, 
                     orbit=False, iters_orbit=1000, alpha_orbit=0.3, color_orbit='blue'):
     """Animate the folding map applied repeatedly."""
