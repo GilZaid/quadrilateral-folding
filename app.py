@@ -128,6 +128,12 @@ st.markdown("""
         max-width: 1400px;
         margin: 0 auto;
     }
+    /* Center the animation container */
+    .centered-content {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -209,7 +215,7 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # CENTER IT PROPERLY WITH COLUMNS
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                st.components.v1.html(html_anim, height=850, scrolling=False)
+            # DON'T USE COLUMNS - USE CSS FLEXBOX INSTEAD
+            st.markdown('<div class="centered-content">', unsafe_allow_html=True)
+            st.components.v1.html(html_anim, height=850, width=850, scrolling=False)
+            st.markdown('</div>', unsafe_allow_html=True)
