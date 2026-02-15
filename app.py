@@ -31,7 +31,7 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     x = [z.real for z in all_points]
     y = [z.imag for z in all_points]
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(8.4, 8.4))
     ax.scatter(x, y, color='black', s=pointsize, alpha=0.6)
     ax.axhline(0, color='k', linewidth=0.5)
     ax.axvline(0, color='k', linewidth=0.5)
@@ -76,7 +76,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
         frames.append((v0, v1, v2, v3))
 
     # Set up the figure
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(7.2, 7.2))
 
     def update(frame_num):
         ax.clear()
@@ -125,7 +125,7 @@ st.markdown("""
     }
     .block-container {
         padding-top: 2rem;
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
     }
     </style>
@@ -169,8 +169,8 @@ if mode == "Plot Orbit":
     if generate:
         with st.spinner("Generating orbit..."):
             fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-            # Center using columns
-            col1, col2, col3 = st.columns([1, 2, 1])
+            # Center the figure
+            col1, col2, col3 = st.columns([0.5, 3, 0.5])
             with col2:
                 st.pyplot(fig, use_container_width=False)
             plt.close()
@@ -209,7 +209,7 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # Center using columns
-            col1, col2, col3 = st.columns([1, 2, 1])
+            # Center the animation with proper width
+            col1, col2, col3 = st.columns([0.5, 3, 0.5])
             with col2:
-                st.components.v1.html(html_anim, height=700, scrolling=False)
+                st.components.v1.html(html_anim, height=850, scrolling=False)
