@@ -76,7 +76,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
         frames.append((v0, v1, v2, v3))
 
     # Set up the figure
-    fig, ax = plt.subplots(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(7, 7))
 
     def update(frame_num):
         ax.clear()
@@ -109,7 +109,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
 
 # ===== STREAMLIT UI =====
 
-st.set_page_config(page_title="Iterated Folding Visualizer", layout="centered")
+st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
 
 # Custom CSS for black and white theme
 st.markdown("""
@@ -121,12 +121,6 @@ st.markdown("""
         color: black;
         text-align: center;
         font-weight: 400;
-    }
-    /* Center the animation container */
-    div[data-testid="stVerticalBlock"] > div:has(iframe) {
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -198,7 +192,4 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # Create a centered container for the animation
-            st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
-            st.components.v1.html(html_anim, height=800, width=800, scrolling=False)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.components.v1.html(html_anim, height=900, scrolling=True)
