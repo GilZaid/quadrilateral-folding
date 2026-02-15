@@ -5,6 +5,8 @@ from matplotlib.animation import FuncAnimation
 import io
 import base64
 
+# ===== FUNCTION DEFINITIONS =====
+
 def fold(v0, v1, v2, v3):
     """Apply cyclic folding to a given quadrilateral and return the new set
     of vertices.
@@ -107,7 +109,8 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
     plt.close()
     return anim.to_jshtml()
 
-# Streamlit UI
+# ===== STREAMLIT UI =====
+
 st.set_page_config(page_title="Folding Map Visualizer", layout="wide")
 st.title("🔄 Folding Map Visualizer")
 
@@ -138,15 +141,10 @@ if mode == "Plot Orbit":
     
     with col2:
         if generate:
-            with st.spinner("Generating animation... This may take a moment."):
-                if orbit:
-                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
-                                               pointsize, orbit, iters_orbit, 
-                                               alpha_orbit, color_orbit)
-                else:
-                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
-                
-                st.components.v1.html(html_anim, height=700, scrolling=True)
+            with st.spinner("Generating orbit..."):
+                fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
+                st.pyplot(fig)
+                plt.close()
 
 else:  # Animate Folding
     st.header("Folding Animation")
@@ -176,15 +174,11 @@ else:  # Animate Folding
     with col2:
         if generate:
             with st.spinner("Generating animation... This may take a moment."):
-                if orbit:
-                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
-                                               pointsize, orbit, iters_orbit, 
-                                               alpha_orbit, color_orbit)
-                else:
-                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
-                
+                html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
+                                           pointsize, orbit, iters_orbit, 
+                                           alpha_orbit, color_orbit)
                 st.components.v1.html(html_anim, height=700, scrolling=True)
-                
+
 # Info section
 with st.expander("ℹ️ About the Folding Map"):
     st.markdown("""
