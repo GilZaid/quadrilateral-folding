@@ -134,10 +134,10 @@ mode = st.radio("", ["Plot Orbit", "Animate Folding"], horizontal=True, label_vi
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    mu = st.slider("μ (mu)", 0.0, 1.0, 0.5, 0.01)
+    mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01)
     
 with col2:
-    nu = st.slider("ν (nu)", 0.0, 1.0, 0.5, 0.01)
+    nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01)
     
 with col3:
     plotsize = st.slider("Plot Size", 1, 20, 3, 1)
@@ -192,4 +192,4 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            st.components.v1.html(html_anim, height=650, scrolling=False)
+            st.components.v1.html(html_anim, height=750, scrolling=False)
