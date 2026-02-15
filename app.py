@@ -122,34 +122,6 @@ st.markdown("""
         text-align: center;
         font-weight: 400;
     }
-    /* Make slider thumbs (circles) black */
-    .stSlider [role="slider"] {
-        background-color: black !important;
-    }
-    /* Make slider active track black */
-    .stSlider [data-baseweb="slider"] > div > div {
-        background-color: black !important;
-    }
-    /* Make checkbox checkmark black */
-    .stCheckbox input[type="checkbox"]:checked + div {
-        background-color: black !important;
-        border-color: black !important;
-    }
-    /* Make radio button selected black */
-    .stRadio [role="radiogroup"] label[data-checked="true"] div:first-child {
-        background-color: black !important;
-        border-color: black !important;
-    }
-    /* Make buttons black */
-    .stButton > button {
-        background-color: black;
-        color: white;
-        border: 1px solid black;
-    }
-    .stButton > button:hover {
-        background-color: #333;
-        color: white;
-    }
     </style>
     """, unsafe_allow_html=True)
 
