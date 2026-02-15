@@ -146,7 +146,7 @@ if mode == "Plot Orbit":
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        iters = st.slider("Iterations", 10, 5000, 1000, 10)
+        iters = st.slider("Iterations", 10, 5000, 2000, 10)
     
     with col2:
         pointsize = st.slider("Point Size", 1, 10, 5, 1)
