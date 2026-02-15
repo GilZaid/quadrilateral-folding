@@ -122,22 +122,25 @@ st.markdown("""
         text-align: center;
         font-weight: 400;
     }
-    /* Make all sliders black and white */
-    .stSlider > div > div > div > div {
-        background-color: black;
+    /* Make slider thumbs (circles) black */
+    .stSlider [role="slider"] {
+        background-color: black !important;
     }
-    .stSlider > div > div > div {
-        background-color: #e0e0e0;
+    /* Make slider active track black */
+    .stSlider [data-baseweb="slider"] > div > div {
+        background-color: black !important;
     }
-    /* Make radio buttons black and white */
-    .stRadio > div {
-        color: black;
+    /* Make checkbox checkmark black */
+    .stCheckbox input[type="checkbox"]:checked + div {
+        background-color: black !important;
+        border-color: black !important;
     }
-    /* Make checkboxes black and white */
-    .stCheckbox > label {
-        color: black;
+    /* Make radio button selected black */
+    .stRadio [role="radiogroup"] label[data-checked="true"] div:first-child {
+        background-color: black !important;
+        border-color: black !important;
     }
-    /* Make buttons black and white */
+    /* Make buttons black */
     .stButton > button {
         background-color: black;
         color: white;
@@ -179,7 +182,7 @@ if mode == "Plot Orbit":
     with col3:
         st.write("")  # spacer
 
-    generate = st.button("Generate Orbit Plot", use_container_width=True)
+    generate = st.button("Generate Orbit Plot", type="primary", use_container_width=True)
     
     if generate:
         with st.spinner("Generating orbit..."):
@@ -210,7 +213,7 @@ else:  # Animate Folding
     with col3:
         alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05) if orbit else 0.3
 
-    generate = st.button("Generate Animation", use_container_width=True)
+    generate = st.button("Generate Animation", type="primary", use_container_width=True)
     
     if generate:
         with st.spinner("Generating animation..."):
