@@ -122,6 +122,31 @@ st.markdown("""
         text-align: center;
         font-weight: 400;
     }
+    /* Make all sliders black and white */
+    .stSlider > div > div > div > div {
+        background-color: black;
+    }
+    .stSlider > div > div > div {
+        background-color: #e0e0e0;
+    }
+    /* Make radio buttons black and white */
+    .stRadio > div {
+        color: black;
+    }
+    /* Make checkboxes black and white */
+    .stCheckbox > label {
+        color: black;
+    }
+    /* Make buttons black and white */
+    .stButton > button {
+        background-color: black;
+        color: white;
+        border: 1px solid black;
+    }
+    .stButton > button:hover {
+        background-color: #333;
+        color: white;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -134,13 +159,13 @@ mode = st.radio("", ["Plot Orbit", "Animate Folding"], horizontal=True, label_vi
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    mu = st.slider("μ (mu)", -5.0, 5.0, 0.5, 0.1)
+    mu = st.slider("μ (mu)", 0.0, 1.0, 0.5, 0.01)
     
 with col2:
-    nu = st.slider("ν (nu)", -5.0, 5.0, 0.5, 0.1)
+    nu = st.slider("ν (nu)", 0.0, 1.0, 0.5, 0.01)
     
 with col3:
-    plotsize = st.slider("Plot Size", 1, 10, 3, 1)
+    plotsize = st.slider("Plot Size", 1, 20, 3, 1)
 
 if mode == "Plot Orbit":
     col1, col2, col3 = st.columns(3)
@@ -149,12 +174,12 @@ if mode == "Plot Orbit":
         iters = st.slider("Iterations", 10, 5000, 1000, 10)
     
     with col2:
-        pointsize = st.slider("Point Size", 1, 20, 5, 1)
+        pointsize = st.slider("Point Size", 1, 10, 5, 1)
     
     with col3:
         st.write("")  # spacer
 
-    generate = st.button("Generate Orbit Plot", type="primary", use_container_width=True)
+    generate = st.button("Generate Orbit Plot", use_container_width=True)
     
     if generate:
         with st.spinner("Generating orbit..."):
@@ -169,10 +194,10 @@ else:  # Animate Folding
         iters = st.slider("Animation Iterations", 1, 100, 20, 1)
     
     with col2:
-        duration = st.slider("Frame Duration (ms)", 50, 2000, 200, 50)
+        duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50)
     
     with col3:
-        pointsize = st.slider("Point Size", 1, 20, 2, 1)
+        pointsize = st.slider("Point Size", 1, 10, 2, 1)
     
     col1, col2, col3 = st.columns(3)
     
@@ -185,7 +210,7 @@ else:  # Animate Folding
     with col3:
         alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05) if orbit else 0.3
 
-    generate = st.button("Generate Animation", type="primary", use_container_width=True)
+    generate = st.button("Generate Animation", use_container_width=True)
     
     if generate:
         with st.spinner("Generating animation..."):
