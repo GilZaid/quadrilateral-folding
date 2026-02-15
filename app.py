@@ -122,6 +122,12 @@ st.markdown("""
         text-align: center;
         font-weight: 400;
     }
+    /* Center the animation container */
+    div[data-testid="stVerticalBlock"] > div:has(iframe) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -192,4 +198,7 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            st.components.v1.html(html_anim, height=750, scrolling=False)
+            # Create a centered container for the animation
+            st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
+            st.components.v1.html(html_anim, height=800, width=800, scrolling=False)
+            st.markdown("</div>", unsafe_allow_html=True)
