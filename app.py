@@ -2,11 +2,9 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from IPython.display import HTML
 import io
 import base64
 
-# Copy your functions here
 def fold(v0, v1, v2, v3):
     """Apply cyclic folding to a given quadrilateral and return the new set
     of vertices.
@@ -107,7 +105,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
 
     anim = FuncAnimation(fig, update, frames=len(frames), interval=duration, repeat=True)
     plt.close()
-    return HTML(anim.to_jshtml())
+    return anim.to_jshtml()
 
 # Streamlit UI
 st.set_page_config(page_title="Folding Map Visualizer", layout="wide")
@@ -140,10 +138,15 @@ if mode == "Plot Orbit":
     
     with col2:
         if generate:
-            with st.spinner("Generating orbit..."):
-                fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-                st.pyplot(fig)
-                plt.close()
+            with st.spinner("Generating animation... This may take a moment."):
+                if orbit:
+                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
+                                               pointsize, orbit, iters_orbit, 
+                                               alpha_orbit, color_orbit)
+                else:
+                    html_anim = animate_folding(mu, nu, iters, duration, plotsize, pointsize)
+                
+                st.components.v1.html(html_anim, height=700, scrolling=True)  # CHANGED: removed .data
 
 else:  # Animate Folding
     st.header("Folding Animation")
