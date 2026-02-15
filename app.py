@@ -128,6 +128,11 @@ st.markdown("""
         max-width: 1400px;
         margin: 0 auto;
     }
+    /* Center iframe content */
+    iframe {
+        display: block;
+        margin: 0 auto;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -193,7 +198,7 @@ else:  # Animate Folding
         orbit = st.checkbox("Show Orbit Background", value=False)
     
     with col2:
-        iters_orbit = st.slider("Orbit Iterations", 100, 5000, 1000, 100) if orbit else 1000
+        iters_orbit = st.slider("Orbit Iterations", 100, 5000, 2000, 100) if orbit else 2000
     
     with col3:
         alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05) if orbit else 0.3
@@ -209,7 +214,7 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # Center the animation with proper width
-            col1, col2, col3 = st.columns([0.5, 3, 0.5])
-            with col2:
-                st.components.v1.html(html_anim, height=850, scrolling=False)
+            # Center the animation
+            st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
+            st.components.v1.html(html_anim, height=850, scrolling=False)
+            st.markdown('</div>', unsafe_allow_html=True)
