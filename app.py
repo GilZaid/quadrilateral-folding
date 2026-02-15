@@ -2,8 +2,6 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import io
-import base64
 
 # ===== FUNCTION DEFINITIONS =====
 
@@ -47,7 +45,7 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     return fig
 
 def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2, 
-                    orbit=False, iters_orbit=1000, alpha_orbit=0.3, color_orbit='blue'):
+                    orbit=False, iters_orbit=1000, alpha_orbit=0.3):
     """Animate the folding map applied repeatedly."""
     
     # Compute orbit for backdrop
@@ -85,7 +83,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
 
         # Draw orbit backdrop
         if orbit:
-            ax.scatter(orbit_x, orbit_y, color=color_orbit, s=pointsize, alpha=alpha_orbit)
+            ax.scatter(orbit_x, orbit_y, color='gray', s=pointsize, alpha=alpha_orbit)
 
         # Draw current quadrilateral
         v0, v1, v2, v3 = frames[frame_num]
@@ -111,81 +109,87 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
 
 # ===== STREAMLIT UI =====
 
-st.set_page_config(page_title="Folding Map Visualizer", layout="wide")
-st.title("🔄 Folding Map Visualizer")
+st.set_page_config(page_title="Iterated Folding Visualizer", layout="centered")
 
+# Custom CSS for black and white theme
 st.markdown("""
-This app visualizes the iterative folding of quadrilaterals in the complex plane.
-Choose between viewing the orbit or an animated folding sequence.
-""")
+    <style>
+    .stApp {
+        background-color: white;
+    }
+    h1 {
+        color: black;
+        text-align: center;
+        font-weight: 400;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Sidebar for mode selection
-mode = st.sidebar.radio("Select Visualization Mode", ["Plot Orbit", "Animate Folding"])
+st.title("Iterated Folding Visualizer")
 
-# Common parameters
-st.sidebar.header("Parameters")
-mu = st.sidebar.slider("μ (mu)", -5.0, 5.0, 0.5, 0.1)
-nu = st.sidebar.slider("ν (nu)", -5.0, 5.0, 0.5, 0.1)
-plotsize = st.sidebar.slider("Plot Size", 1, 10, 3, 1)
+# Mode selection at top
+mode = st.radio("", ["Plot Orbit", "Animate Folding"], horizontal=True, label_visibility="collapsed")
+
+# All parameters at the top
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    mu = st.slider("μ (mu)", -5.0, 5.0, 0.5, 0.1)
+    
+with col2:
+    nu = st.slider("ν (nu)", -5.0, 5.0, 0.5, 0.1)
+    
+with col3:
+    plotsize = st.slider("Plot Size", 1, 10, 3, 1)
 
 if mode == "Plot Orbit":
-    st.header("Orbit Visualization")
-    
-    col1, col2 = st.columns([1, 2])
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         iters = st.slider("Iterations", 10, 5000, 1000, 10)
-        pointsize = st.slider("Point Size", 1, 20, 5, 1)
-        
-        generate = st.button("Generate Orbit Plot", type="primary")
     
     with col2:
-        if generate:
-            with st.spinner("Generating orbit..."):
-                fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-                st.pyplot(fig)
-                plt.close()
+        pointsize = st.slider("Point Size", 1, 20, 5, 1)
+    
+    with col3:
+        st.write("")  # spacer
+
+    generate = st.button("Generate Orbit Plot", type="primary", use_container_width=True)
+    
+    if generate:
+        with st.spinner("Generating orbit..."):
+            fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
+            st.pyplot(fig, use_container_width=True)
+            plt.close()
 
 else:  # Animate Folding
-    st.header("Folding Animation")
-    
-    col1, col2 = st.columns([1, 2])
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         iters = st.slider("Animation Iterations", 1, 100, 20, 1)
-        duration = st.slider("Frame Duration (ms)", 50, 2000, 200, 50)
-        pointsize = st.slider("Point Size", 1, 20, 2, 1)
-        
-        st.subheader("Orbit Background")
-        orbit = st.checkbox("Show Orbit Background", value=False)
-        
-        # Initialize defaults
-        iters_orbit = 1000
-        alpha_orbit = 0.3
-        color_orbit = "#0000FF"
-        
-        if orbit:
-            iters_orbit = st.slider("Orbit Iterations", 100, 5000, 1000, 100)
-            alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05)
-            color_orbit = st.color_picker("Orbit Color", "#0000FF")
-        
-        generate = st.button("Generate Animation", type="primary")
     
     with col2:
-        if generate:
-            with st.spinner("Generating animation... This may take a moment."):
-                html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
-                                           pointsize, orbit, iters_orbit, 
-                                           alpha_orbit, color_orbit)
-                st.components.v1.html(html_anim, height=700, scrolling=True)
-
-# Info section
-with st.expander("ℹ️ About the Folding Map"):
-    st.markdown("""
-    The folding map is a dynamical system that iteratively transforms quadrilaterals in the complex plane.
+        duration = st.slider("Frame Duration (ms)", 50, 2000, 200, 50)
     
-    - **μ (mu)** and **ν (nu)** are parameters that define the initial quadrilateral
-    - The **fold** operation applies a geometric transformation to create a new quadrilateral
-    - **Orbit** shows all vertex positions across many iterations
-    - **Animation** shows the folding process step by step
-    """)
+    with col3:
+        pointsize = st.slider("Point Size", 1, 20, 2, 1)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        orbit = st.checkbox("Show Orbit Background", value=False)
+    
+    with col2:
+        iters_orbit = st.slider("Orbit Iterations", 100, 5000, 1000, 100) if orbit else 1000
+    
+    with col3:
+        alpha_orbit = st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05) if orbit else 0.3
+
+    generate = st.button("Generate Animation", type="primary", use_container_width=True)
+    
+    if generate:
+        with st.spinner("Generating animation..."):
+            html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
+                                       pointsize, orbit, iters_orbit, 
+                                       alpha_orbit)
+            st.components.v1.html(html_anim, height=650, scrolling=False)
