@@ -31,7 +31,7 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     x = [z.real for z in all_points]
     y = [z.imag for z in all_points]
 
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=(6, 6))
     ax.scatter(x, y, color='black', s=pointsize, alpha=0.6)
     ax.axhline(0, color='k', linewidth=0.5)
     ax.axvline(0, color='k', linewidth=0.5)
@@ -76,7 +76,7 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
         frames.append((v0, v1, v2, v3))
 
     # Set up the figure
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=(6, 6))
 
     def update(frame_num):
         ax.clear()
@@ -109,26 +109,24 @@ def animate_folding(mu, nu, iters, duration, plotsize=3, pointsize=2,
 
 # ===== STREAMLIT UI =====
 
-st.set_page_config(page_title="Iterated Folding Visualizer", layout="centered")
+st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
 
 # Custom CSS for black and white theme
 st.markdown("""
     <style>
     .stApp {
         background-color: white;
-        max-width: 1000px;
-        margin: 0 auto;
     }
     h1 {
         color: black;
         text-align: center;
         font-weight: 400;
+        margin-bottom: 2rem;
     }
-    /* Center content */
     .block-container {
-        max-width: 1000px;
-        padding-left: 2rem;
-        padding-right: 2rem;
+        padding-top: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -164,13 +162,17 @@ if mode == "Plot Orbit":
 
     generate = st.button("Generate Orbit Plot", type="primary", use_container_width=True)
     
+    # Add spacing
+    st.write("")
+    st.write("")
+    
     if generate:
         with st.spinner("Generating orbit..."):
             fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-            # Center the plot
-            col1, col2, col3 = st.columns([1, 3, 1])
+            # Center using columns
+            col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
-                st.pyplot(fig)
+                st.pyplot(fig, use_container_width=False)
             plt.close()
 
 else:  # Animate Folding
@@ -198,12 +200,16 @@ else:  # Animate Folding
 
     generate = st.button("Generate Animation", type="primary", use_container_width=True)
     
+    # Add spacing
+    st.write("")
+    st.write("")
+    
     if generate:
         with st.spinner("Generating animation..."):
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # Center the animation
-            col1, col2, col3 = st.columns([1, 3, 1])
+            # Center using columns
+            col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
-                st.components.v1.html(html_anim, height=900, scrolling=True)
+                st.components.v1.html(html_anim, height=700, scrolling=False)
