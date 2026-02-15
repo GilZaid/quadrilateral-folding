@@ -33,6 +33,7 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     y = [z.imag for z in all_points]
 
     fig, ax = plt.subplots(figsize=(7, 7))
+    fig.subplots_adjust(top=0.92)
 
     ax.scatter(x, y, color="black", s=pointsize, alpha=0.6)
     ax.axhline(0, color="k", linewidth=0.5)
@@ -44,9 +45,8 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
 
     ax.set_xlabel("Real")
     ax.set_ylabel("Imaginary")
-    ax.set_title(f"Orbit over {iters} iterations (μ={mu}, ν={nu})")
+    ax.set_title(f"Orbit over {iters} iterations (μ={mu}, ν={nu})", pad=12)
 
-    fig.tight_layout()
     return fig
 
 
@@ -92,6 +92,7 @@ def animate_folding(
         frames.append((v0, v1, v2, v3))
 
     fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    fig.subplots_adjust(top=0.92)
 
     def update(frame_num):
         ax.clear()
@@ -129,7 +130,7 @@ def animate_folding(
         ax.set_xlim(-plotsize, plotsize)
         ax.set_ylim(-plotsize, plotsize)
 
-        ax.set_title(f"Iteration {frame_num}")
+        ax.set_title(f"Iteration {frame_num}", pad=12)
 
     anim = FuncAnimation(
         fig,
@@ -139,7 +140,6 @@ def animate_folding(
         repeat=True,
     )
 
-    fig.tight_layout()
     plt.close()
 
     html = anim.to_jshtml()
@@ -298,6 +298,6 @@ else:
 
             st.components.v1.html(
                 html_anim,
-                height=900,
+                height=950,
                 scrolling=False,
             )
