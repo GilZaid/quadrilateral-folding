@@ -128,11 +128,6 @@ st.markdown("""
         max-width: 1400px;
         margin: 0 auto;
     }
-    /* Center iframe content */
-    iframe {
-        display: block;
-        margin: 0 auto;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -174,8 +169,8 @@ if mode == "Plot Orbit":
     if generate:
         with st.spinner("Generating orbit..."):
             fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-            # Center the figure
-            col1, col2, col3 = st.columns([0.5, 3, 0.5])
+            # Center using empty columns on sides
+            col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
                 st.pyplot(fig, use_container_width=False)
             plt.close()
@@ -214,7 +209,7 @@ else:  # Animate Folding
             html_anim = animate_folding(mu, nu, iters, duration, plotsize, 
                                        pointsize, orbit, iters_orbit, 
                                        alpha_orbit)
-            # Center the animation
-            st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
-            st.components.v1.html(html_anim, height=850, scrolling=False)
-            st.markdown('</div>', unsafe_allow_html=True)
+            # CENTER IT PROPERLY WITH COLUMNS
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.components.v1.html(html_anim, height=850, scrolling=False)
