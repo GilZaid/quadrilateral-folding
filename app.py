@@ -160,18 +160,41 @@ st.set_page_config(
     layout="wide",
 )
 
+# Force light appearance regardless of user dark mode
 st.markdown(
     """
     <style>
     .stApp {
         background-color: white;
-    }
-    h1 {
         color: black;
-        text-align: center;
-        font-weight: 400;
-        margin-bottom: 2rem;
     }
+
+    html, body, [class*="css"] {
+        color: black !important;
+    }
+
+    h1, h2, h3, h4, h5, h6, p, span, label, div {
+        color: black !important;
+    }
+
+    .stSlider label {
+        color: black !important;
+    }
+
+    .stRadio label {
+        color: black !important;
+    }
+
+    .stCheckbox label {
+        color: black !important;
+    }
+
+    .stButton button {
+        color: black !important;
+        background-color: white;
+        border: 1px solid black;
+    }
+
     .block-container {
         padding-top: 2rem;
         max-width: 1400px;
