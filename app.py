@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-
 # Function definitions
 
 def fold(v0, v1, v2, v3):
@@ -14,7 +13,6 @@ def fold(v0, v1, v2, v3):
     new_v2 = v3
     new_v3 = v0_folded
     return new_v0, new_v1, new_v2, new_v3
-
 
 def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     """Plot orbit and return figure."""
@@ -48,7 +46,6 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     ax.set_title(f"Orbit over {iters} iterations (μ={mu}, ν={nu})", pad=12)
 
     return fig
-
 
 def animate_folding(
     mu,
