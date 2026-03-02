@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+
 # =========================
 # Folding Functions
 # =========================
@@ -16,21 +17,16 @@ def fold(v0, v1, v2, v3):
     new_v3 = v0_folded
     return new_v0, new_v1, new_v2, new_v3
 
+
 def fold_centered(v0, v1, v2, v3):
     """Apply cyclic folding, then recenter vertices at origin."""
     v0, v1, v2, v3 = fold(v0, v1, v2, v3)
-
     center = (v0 + v1 + v2 + v3) / 4
+    return v0 - center, v1 - center, v2 - center, v3 - center
 
-    v0 -= center
-    v1 -= center
-    v2 -= center
-    v3 -= center
-
-    return v0, v1, v2, v3
 
 # =========================
-# Orbit Plot (unchanged)
+# Orbit Plot
 # =========================
 
 def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
@@ -65,34 +61,28 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
 
     return fig
 
+
 # =========================
-# Animation (unchanged)
+# Animation (Standard)
 # =========================
 
 def animate_folding(
-    mu,
-    nu,
-    iters,
-    duration,
-    plotsize=3,
-    pointsize=2,
-    orbit=False,
-    iters_orbit=1000,
-    alpha_orbit=0.3,
+    mu, nu, iters, duration, plotsize=3,
+    pointsize=2, orbit=False,
+    iters_orbit=1000, alpha_orbit=0.3,
 ):
-    if orbit:
-        v0_orbit = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
-        v1_orbit = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
-        v2_orbit = v1_orbit.conjugate()
-        v3_orbit = v0_orbit.conjugate()
 
-        orbit_points = [v0_orbit, v1_orbit, v2_orbit, v3_orbit]
+    if orbit:
+        v0_o = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
+        v1_o = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
+        v2_o = v1_o.conjugate()
+        v3_o = v0_o.conjugate()
+
+        orbit_points = [v0_o, v1_o, v2_o, v3_o]
 
         for _ in range(iters_orbit):
-            v0_orbit, v1_orbit, v2_orbit, v3_orbit = fold(
-                v0_orbit, v1_orbit, v2_orbit, v3_orbit
-            )
-            orbit_points.extend([v0_orbit, v1_orbit, v2_orbit, v3_orbit])
+            v0_o, v1_o, v2_o, v3_o = fold(v0_o, v1_o, v2_o, v3_o)
+            orbit_points.extend([v0_o, v1_o, v2_o, v3_o])
 
         orbit_x = [z.real for z in orbit_points]
         orbit_y = [z.imag for z in orbit_points]
@@ -116,8 +106,7 @@ def animate_folding(
 
         if orbit:
             ax.scatter(
-                orbit_x,
-                orbit_y,
+                orbit_x, orbit_y,
                 color="gray",
                 s=pointsize,
                 alpha=alpha_orbit,
@@ -146,54 +135,42 @@ def animate_folding(
 
         ax.set_xlim(-plotsize, plotsize)
         ax.set_ylim(-plotsize, plotsize)
-
         ax.set_title(f"Iteration {frame_num}", pad=12)
 
-    anim = FuncAnimation(
-        fig,
-        update,
-        frames=len(frames),
-        interval=duration,
-        repeat=True,
-    )
+    anim = FuncAnimation(fig, update, frames=len(frames),
+                         interval=duration, repeat=True)
 
     plt.close()
     return anim.to_jshtml()
 
+
 # =========================
-# NEW Centered Animation
+# Animation (Centered)
 # =========================
 
 def animate_folding_centered(
-    mu,
-    nu,
-    iters,
-    duration,
-    plotsize=3,
-    pointsize=2,
-    orbit=False,
-    iters_orbit=1000,
-    alpha_orbit=0.3,
+    mu, nu, iters, duration, plotsize=3,
+    pointsize=2, orbit=False,
+    iters_orbit=1000, alpha_orbit=0.3,
 ):
+
     if orbit:
-        v0_orbit = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
-        v1_orbit = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
-        v2_orbit = v1_orbit.conjugate()
-        v3_orbit = v0_orbit.conjugate()
+        v0_o = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
+        v1_o = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
+        v2_o = v1_o.conjugate()
+        v3_o = v0_o.conjugate()
 
-        center = (v0_orbit + v1_orbit + v2_orbit + v3_orbit) / 4
-        v0_orbit -= center
-        v1_orbit -= center
-        v2_orbit -= center
-        v3_orbit -= center
+        center = (v0_o + v1_o + v2_o + v3_o) / 4
+        v0_o -= center
+        v1_o -= center
+        v2_o -= center
+        v3_o -= center
 
-        orbit_points = [v0_orbit, v1_orbit, v2_orbit, v3_orbit]
+        orbit_points = [v0_o, v1_o, v2_o, v3_o]
 
         for _ in range(iters_orbit):
-            v0_orbit, v1_orbit, v2_orbit, v3_orbit = fold_centered(
-                v0_orbit, v1_orbit, v2_orbit, v3_orbit
-            )
-            orbit_points.extend([v0_orbit, v1_orbit, v2_orbit, v3_orbit])
+            v0_o, v1_o, v2_o, v3_o = fold_centered(v0_o, v1_o, v2_o, v3_o)
+            orbit_points.extend([v0_o, v1_o, v2_o, v3_o])
 
         orbit_x = [z.real for z in orbit_points]
         orbit_y = [z.imag for z in orbit_points]
@@ -223,8 +200,7 @@ def animate_folding_centered(
 
         if orbit:
             ax.scatter(
-                orbit_x,
-                orbit_y,
+                orbit_x, orbit_y,
                 color="gray",
                 s=pointsize,
                 alpha=alpha_orbit,
@@ -253,26 +229,20 @@ def animate_folding_centered(
 
         ax.set_xlim(-plotsize, plotsize)
         ax.set_ylim(-plotsize, plotsize)
-
         ax.set_title(f"Iteration {frame_num} (Centered)", pad=12)
 
-    anim = FuncAnimation(
-        fig,
-        update,
-        frames=len(frames),
-        interval=duration,
-        repeat=True,
-    )
+    anim = FuncAnimation(fig, update, frames=len(frames),
+                         interval=duration, repeat=True)
 
     plt.close()
     return anim.to_jshtml()
+
 
 # =========================
 # Streamlit UI
 # =========================
 
 st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
-
 st.title("Iterated Folding Visualizer")
 
 mode = st.radio(
@@ -293,8 +263,9 @@ with col2:
 with col3:
     plotsize = st.slider("Plot Size", 1, 20, 3, 1)
 
+
 # =========================
-# Mode 1: Plot Orbit
+# Plot Orbit Mode
 # =========================
 
 if mode == "Plot Orbit":
@@ -312,13 +283,14 @@ if mode == "Plot Orbit":
         st.pyplot(fig)
         plt.close()
 
+
 # =========================
-# Mode 2: Animate Folding
+# Animation Modes
 # =========================
 
-elif mode == "Animate Folding":
+else:
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         iters = st.slider("Animation Iterations", 1, 100, 20, 1)
@@ -326,30 +298,39 @@ elif mode == "Animate Folding":
     with col2:
         duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50)
 
-    orbit = st.checkbox("Show Orbit Background", value=False)
+    with col3:
+        pointsize = st.slider("Point Size", 1, 10, 2, 1)
 
-    if st.button("Generate Animation", type="primary", use_container_width=True):
-        html_anim = animate_folding(mu, nu, iters, duration, plotsize, 2, orbit)
-        st.components.v1.html(html_anim, height=900)
-
-# =========================
-# Mode 3: Animate Folding (Centered)
-# =========================
-
-elif mode == "Animate Folding (Centered)":
-
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        iters = st.slider("Animation Iterations", 1, 100, 20, 1)
+        orbit = st.checkbox("Show Orbit Background", value=False)
 
     with col2:
-        duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50)
-
-    orbit = st.checkbox("Show Orbit Background", value=False)
-
-    if st.button("Generate Centered Animation", type="primary", use_container_width=True):
-        html_anim = animate_folding_centered(
-            mu, nu, iters, duration, plotsize, 2, orbit
+        iters_orbit = (
+            st.slider("Orbit Iterations", 100, 5000, 2000, 100)
+            if orbit
+            else 2000
         )
-        st.components.v1.html(html_anim, height=900)
+
+    with col3:
+        alpha_orbit = (
+            st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05)
+            if orbit
+            else 0.3
+        )
+
+    if mode == "Animate Folding":
+        label = "Generate Animation"
+        func = animate_folding
+    else:
+        label = "Generate Centered Animation"
+        func = animate_folding_centered
+
+    if st.button(label, type="primary", use_container_width=True):
+        html_anim = func(
+            mu, nu, iters, duration,
+            plotsize, pointsize,
+            orbit, iters_orbit, alpha_orbit
+        )
+        st.components.v1.html(html_anim, height=950)
