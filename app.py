@@ -490,10 +490,7 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
         duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50, key="anim_duration")
 
     with col3:
-        if mode == "Animate Folding (Centered)":
-            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25, key="centered_plotsize")
-        else:
-            pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
+        pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
 
     col1, col2, col3 = st.columns(3)
 
@@ -522,7 +519,7 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
     if st.button(label, type="primary", use_container_width=True, key="anim_button"):
         html_anim = func(
             mu, nu, iters, duration,
-            plotsize, pointsize if mode == "Animate Folding" else 2,
+            plotsize, pointsize,
             orbit, iters_orbit, alpha_orbit
         )
         # figure is 7x7 at dpi=80 → 560px; controls add ~130px; padding adds 16px
