@@ -4,13 +4,41 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy import integrate
 
+st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
+
+# Force light mode regardless of device/browser settings
+st.markdown("""
+    <style>
+        html, body,
+        [data-testid="stAppViewContainer"],
+        [data-testid="stApp"],
+        [data-testid="stMain"],
+        .main { 
+            background-color: white !important;
+            color: black !important;
+        }
+        [data-testid="stSidebar"] { background-color: #f8f8f8 !important; }
+        @media (prefers-color-scheme: dark) {
+            html, body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stApp"],
+            [data-testid="stMain"],
+            .main {
+                background-color: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("Iterated Folding Visualizer")
+
 
 # =========================
 # Folding Functions
 # =========================
 
 def fold(v0, v1, v2, v3):
-    """Apply cyclic folding to a given quadrilateral."""
     v0_folded = (np.conj(v0 - v1) * (v3 - v1)) / np.conj(v3 - v1) + v1
     new_v0 = v1
     new_v1 = v2
@@ -20,7 +48,6 @@ def fold(v0, v1, v2, v3):
 
 
 def fold_centered(v0, v1, v2, v3):
-    """Apply cyclic folding, then recenter vertices at origin."""
     v0, v1, v2, v3 = fold(v0, v1, v2, v3)
     center = (v0 + v1 + v2 + v3) / 4
     return v0 - center, v1 - center, v2 - center, v3 - center
@@ -72,7 +99,6 @@ def animate_folding(
     pointsize=2, orbit=False,
     iters_orbit=1000, alpha_orbit=0.3,
 ):
-
     if orbit:
         v0_o = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
         v1_o = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
@@ -106,12 +132,7 @@ def animate_folding(
         ax.clear()
 
         if orbit:
-            ax.scatter(
-                orbit_x, orbit_y,
-                color="gray",
-                s=pointsize,
-                alpha=alpha_orbit,
-            )
+            ax.scatter(orbit_x, orbit_y, color="gray", s=pointsize, alpha=alpha_orbit)
 
         v0, v1, v2, v3 = frames[frame_num]
         vertices = [v0, v1, v2, v3]
@@ -121,26 +142,17 @@ def animate_folding(
 
         ax.fill(x, y, color="lightgray", alpha=0.5)
         ax.plot(x, y, "k-", linewidth=1)
-
-        ax.scatter(
-            [z.real for z in vertices],
-            [z.imag for z in vertices],
-            color="black",
-            s=20,
-            zorder=5,
-        )
+        ax.scatter([z.real for z in vertices], [z.imag for z in vertices],
+                   color="black", s=20, zorder=5)
 
         ax.axhline(0, color="k", linewidth=0.5)
         ax.axvline(0, color="k", linewidth=0.5)
         ax.grid(True, alpha=0.3)
-
         ax.set_xlim(-plotsize, plotsize)
         ax.set_ylim(-plotsize, plotsize)
         ax.set_title(f"Iteration {frame_num}", pad=12)
 
-    anim = FuncAnimation(fig, update, frames=len(frames),
-                         interval=duration, repeat=True)
-
+    anim = FuncAnimation(fig, update, frames=len(frames), interval=duration, repeat=True)
     plt.close()
     return anim.to_jshtml()
 
@@ -150,11 +162,10 @@ def animate_folding(
 # =========================
 
 def animate_folding_centered(
-    mu, nu, iters, duration, plotsize=3,
+    mu, nu, iters, duration, plotsize=2.0,
     pointsize=2, orbit=False,
     iters_orbit=1000, alpha_orbit=0.3,
 ):
-
     if orbit:
         v0_o = -np.sqrt(1 + mu * nu - mu - nu) + 1j * mu
         v1_o = np.sqrt(1 + mu * nu - mu - nu) + 1j * nu
@@ -200,12 +211,7 @@ def animate_folding_centered(
         ax.clear()
 
         if orbit:
-            ax.scatter(
-                orbit_x, orbit_y,
-                color="gray",
-                s=pointsize,
-                alpha=alpha_orbit,
-            )
+            ax.scatter(orbit_x, orbit_y, color="gray", s=pointsize, alpha=alpha_orbit)
 
         v0, v1, v2, v3 = frames[frame_num]
         vertices = [v0, v1, v2, v3]
@@ -215,26 +221,17 @@ def animate_folding_centered(
 
         ax.fill(x, y, color="lightgray", alpha=0.5)
         ax.plot(x, y, "k-", linewidth=1)
-
-        ax.scatter(
-            [z.real for z in vertices],
-            [z.imag for z in vertices],
-            color="black",
-            s=20,
-            zorder=5,
-        )
+        ax.scatter([z.real for z in vertices], [z.imag for z in vertices],
+                   color="black", s=20, zorder=5)
 
         ax.axhline(0, color="k", linewidth=0.5)
         ax.axvline(0, color="k", linewidth=0.5)
         ax.grid(True, alpha=0.3)
-
         ax.set_xlim(-plotsize, plotsize)
         ax.set_ylim(-plotsize, plotsize)
         ax.set_title(f"Iteration {frame_num} (Centered)", pad=12)
 
-    anim = FuncAnimation(fig, update, frames=len(frames),
-                         interval=duration, repeat=True)
-
+    anim = FuncAnimation(fig, update, frames=len(frames), interval=duration, repeat=True)
     plt.close()
     return anim.to_jshtml()
 
@@ -306,14 +303,13 @@ def _dd_is_degenerate(mu, nu, tol=1e-9):
     return abs(mu + nu - 1) < tol or abs(mu - nu) < tol
 
 
-def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade_steps=8):
+def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, resolution=800, fade_steps=8):
     degenerate = _dd_is_degenerate(mu, nu)
 
     if not degenerate:
         rho = _dd_compute_rho(mu, nu)
         theta_step = 2 * np.pi * rho
 
-    # Build frames + orbit points
     v0, v1, v2, v3 = _dd_initial_vertices(mu, nu)
     frames = [(v0, v1, v2, v3)]
     orbit_x, orbit_y = [], []
@@ -333,7 +329,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
     orbit_x = np.array(orbit_x)
     orbit_y = np.array(orbit_y)
 
-    # Elliptic curve — square window
     curve_pad = 1.0
     Q, L, C = _dd_QLC(mu, nu)
 
@@ -362,7 +357,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
     X, Y = np.meshgrid(x_vals, y_vals)
     Z = F(X, Y)
 
-    # Circle orbit
     if not degenerate:
         circle_pts = []
         theta = 0
@@ -372,10 +366,10 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
                 theta += theta_step
         circle_pts = np.array(circle_pts)
 
-    # Build animation
-    quad_window = 1.5
     n_panels = 2 if degenerate else 3
-    fig, axes = plt.subplots(1, n_panels, figsize=(6 * n_panels, 6))
+    # Smaller figsize so the whole animation fits without being cut off
+    fig, axes = plt.subplots(1, n_panels, figsize=(5 * n_panels, 5))
+    fig.tight_layout(pad=2.0)
 
     ax_quad  = axes[0]
     ax_curve = axes[1]
@@ -383,16 +377,13 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
 
     def draw_fading_path(ax, xs, ys, i):
         for k in range(i):
-            if k >= i - fade_steps:
-                alpha = 0.5 + 0.5 * (k - (i - fade_steps)) / fade_steps
-            else:
-                alpha = 0.5
+            alpha = (0.5 + 0.5*(k - (i - fade_steps)) / fade_steps
+                     if k >= i - fade_steps else 0.5)
             ax.plot(xs[k:k+2], ys[k:k+2],
                     color="gray", linewidth=1.4, alpha=alpha,
                     solid_capstyle='round', solid_joinstyle='round', zorder=1)
 
     def update(i):
-        # Quadrilateral
         ax_quad.clear()
         v0, v1, v2, v3 = frames[i]
         verts = [v0, v1, v2, v3]
@@ -411,7 +402,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
         ax_quad.grid(True, alpha=0.3)
         ax_quad.set_title(f"Cyclic Folding\nIteration {i}")
 
-        # Elliptic curve
         ax_curve.clear()
         draw_fading_path(ax_curve, orbit_x, orbit_y, i)
         ax_curve.contour(X, Y, Z, levels=[0], colors="black", linewidths=1.5, zorder=3)
@@ -422,7 +412,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
         ax_curve.grid(True, alpha=0.3)
         ax_curve.set_title("Dynamics of π on Σ")
 
-        # Circle
         if not degenerate:
             ax_circle.clear()
             draw_fading_path(ax_circle, circle_pts[:, 0], circle_pts[:, 1], i)
@@ -446,9 +435,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, resolution=800, fade
 # =========================
 # Streamlit UI
 # =========================
-
-st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
-st.title("Iterated Folding Visualizer")
 
 mode = st.radio(
     "",
@@ -504,7 +490,10 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
         duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50)
 
     with col3:
-        pointsize = st.slider("Point Size", 1, 10, 2, 1)
+        if mode == "Animate Folding (Centered)":
+            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25)
+        else:
+            pointsize = st.slider("Point Size", 1, 10, 2, 1)
 
     col1, col2, col3 = st.columns(3)
 
@@ -514,15 +503,13 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
     with col2:
         iters_orbit = (
             st.slider("Orbit Iterations", 100, 5000, 2000, 100)
-            if orbit
-            else 2000
+            if orbit else 2000
         )
 
     with col3:
         alpha_orbit = (
             st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05)
-            if orbit
-            else 0.3
+            if orbit else 0.3
         )
 
     if mode == "Animate Folding":
@@ -535,10 +522,10 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
     if st.button(label, type="primary", use_container_width=True):
         html_anim = func(
             mu, nu, iters, duration,
-            plotsize, pointsize,
+            plotsize, pointsize if mode == "Animate Folding" else 2,
             orbit, iters_orbit, alpha_orbit
         )
-        st.components.v1.html(html_anim, height=950)
+        st.components.v1.html(html_anim, height=600)
 
 
 # =========================
@@ -547,7 +534,7 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
 
 else:
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         iters = st.slider("Animation Iterations", 1, 200, 50, 1)
@@ -555,13 +542,15 @@ else:
     with col2:
         duration = st.slider("Frame Duration (ms)", 50, 1000, 300, 50)
 
+    with col3:
+        quad_window = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 1.5, 0.25)
+
     if _dd_is_degenerate(mu, nu):
         st.warning(
-            f"Degenerate case detected (μ + ν = 1 or μ = ν). "
-            f"The rotation number is undefined and the circle panel will be hidden."
+            "Degenerate case detected (μ + ν = 1 or μ = ν). "
+            "The rotation number is undefined and the circle panel will be hidden."
         )
 
     if st.button("Generate Diagonal Dynamics", type="primary", use_container_width=True):
-        html_anim, degen = diagonal_dynamics_animation(mu, nu, iters, duration)
-        height = 750 if degen else 750
-        st.components.v1.html(html_anim, height=height)
+        html_anim, degen = diagonal_dynamics_animation(mu, nu, iters, duration, quad_window)
+        st.components.v1.html(html_anim, height=600)
