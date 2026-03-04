@@ -100,7 +100,7 @@ def animate_folding(
         v0, v1, v2, v3 = fold(v0, v1, v2, v3)
         frames.append((v0, v1, v2, v3))
 
-    fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    fig, ax = plt.subplots(figsize=(5, 5))
     fig.subplots_adjust(top=0.92)
 
     def update(frame_num):
@@ -179,7 +179,7 @@ def animate_folding_centered(
         v0, v1, v2, v3 = fold_centered(v0, v1, v2, v3)
         frames.append((v0, v1, v2, v3))
 
-    fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    fig, ax = plt.subplots(figsize=(5, 5))
     fig.subplots_adjust(top=0.92)
 
     def update(frame_num):
@@ -342,11 +342,13 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
         circle_pts = np.array(circle_pts)
 
     n_panels = 2 if degenerate else 3
-    panel_px = 500  # pixels per panel at 100 dpi
-    fig_w = 5 * n_panels
-    fig_h = 5
-    fig, axes = plt.subplots(1, n_panels, figsize=(fig_w, fig_h), dpi=100)
-    fig.tight_layout(pad=2.5)
+
+    # Scale 0.8: each panel 4 inches wide x 4 tall
+    fig_w = 4 * n_panels
+    fig_h = 4
+    dpi = 100
+    fig, axes = plt.subplots(1, n_panels, figsize=(fig_w, fig_h), dpi=dpi)
+    fig.subplots_adjust(left=0.06, right=0.97, top=0.88, bottom=0.08, wspace=0.35)
 
     ax_quad  = axes[0]
     ax_curve = axes[1]
@@ -377,7 +379,7 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
         ax_quad.set_ylim(-quad_window, quad_window)
         ax_quad.set_aspect("equal")
         ax_quad.grid(True, alpha=0.3)
-        ax_quad.set_title(f"Cyclic Folding\nIteration {i}")
+        ax_quad.set_title(f"Cyclic Folding\nIteration {i}", fontsize=9)
 
         ax_curve.clear()
         draw_fading_path(ax_curve, orbit_x, orbit_y, i)
@@ -387,7 +389,7 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
         ax_curve.set_ylim(ymin, ymax)
         ax_curve.set_aspect("equal")
         ax_curve.grid(True, alpha=0.3)
-        ax_curve.set_title("Dynamics of π on Σ")
+        ax_curve.set_title("Dynamics of π on Σ", fontsize=9)
 
         if not degenerate:
             ax_circle.clear()
@@ -401,14 +403,14 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
             ax_circle.set_ylim(-1.2, 1.2)
             ax_circle.set_aspect("equal")
             ax_circle.grid(True, alpha=0.3)
-            ax_circle.set_title(f"Rotation on Circle csp. τ\nρ ≈ {rho:.5f}")
+            ax_circle.set_title(f"Rotation on Circle csp. τ\nρ ≈ {rho:.5f}", fontsize=9)
 
     anim = FuncAnimation(fig, update, frames=iters + 1,
                          interval=duration_ms, repeat=True)
     plt.close()
-    # Return html and the pixel height needed to show the figure unclipped
-    # jshtml wraps the figure in a container; add ~200px for the player controls
-    render_height = int(fig_h * 100) + 200
+
+    # pixel height of figure + buffer for jshtml controls
+    render_height = int(fig_h * dpi) + 220
     return anim.to_jshtml(), degenerate, render_height
 
 
@@ -439,6 +441,17 @@ with col3:
         plotsize = 3  # not used in this mode
 
 
+# helper: render jshtml centered with correct height
+def show_animation(html_str, fig_height_px):
+    # Add top padding and center via a wrapping div
+    wrapped = f"""
+    <div style="display:flex; justify-content:center; padding-top:20px;">
+      {html_str}
+    </div>
+    """
+    st.components.v1.html(wrapped, height=fig_height_px)
+
+
 # =========================
 # Plot Orbit Mode
 # =========================
@@ -455,7 +468,10 @@ if mode == "Plot Orbit":
 
     if st.button("Generate Orbit Plot", type="primary", use_container_width=True):
         fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-        st.pyplot(fig)
+        # Scale down by 0.6 and center
+        buf_col1, buf_col2, buf_col3 = st.columns([1, 2.5, 1])
+        with buf_col2:
+            st.pyplot(fig, use_container_width=True)
         plt.close()
 
 
@@ -509,7 +525,8 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
             plotsize, pointsize if mode == "Animate Folding" else 2,
             orbit, iters_orbit, alpha_orbit
         )
-        st.components.v1.html(html_anim, height=600)
+        # fig is 5x5 at 100dpi = 500px tall; add buffer for controls
+        show_animation(html_anim, fig_height_px=560)
 
 
 # =========================
@@ -539,4 +556,4 @@ else:
         html_anim, degen, render_height = diagonal_dynamics_animation(
             mu, nu, iters, duration, quad_window
         )
-        st.components.v1.html(html_anim, height=render_height)
+        show_animation(html_anim, fig_height_px=render_height)
