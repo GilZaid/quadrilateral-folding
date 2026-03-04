@@ -342,9 +342,11 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
         circle_pts = np.array(circle_pts)
 
     n_panels = 2 if degenerate else 3
-    # Smaller figsize so the whole animation fits without being cut off
-    fig, axes = plt.subplots(1, n_panels, figsize=(5 * n_panels, 5))
-    fig.tight_layout(pad=2.0)
+    panel_px = 500  # pixels per panel at 100 dpi
+    fig_w = 5 * n_panels
+    fig_h = 5
+    fig, axes = plt.subplots(1, n_panels, figsize=(fig_w, fig_h), dpi=100)
+    fig.tight_layout(pad=2.5)
 
     ax_quad  = axes[0]
     ax_curve = axes[1]
@@ -404,7 +406,10 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
     anim = FuncAnimation(fig, update, frames=iters + 1,
                          interval=duration_ms, repeat=True)
     plt.close()
-    return anim.to_jshtml(), degenerate
+    # Return html and the pixel height needed to show the figure unclipped
+    # jshtml wraps the figure in a container; add ~200px for the player controls
+    render_height = int(fig_h * 100) + 200
+    return anim.to_jshtml(), degenerate, render_height
 
 
 # =========================
@@ -416,18 +421,22 @@ mode = st.radio(
     ["Plot Orbit", "Animate Folding", "Animate Folding (Centered)", "Visualize Diagonal Dynamics"],
     horizontal=True,
     label_visibility="collapsed",
+    key="mode_radio",
 )
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01)
+    mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01, key="mu_top")
 
 with col2:
-    nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01)
+    nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01, key="nu_top")
 
 with col3:
-    plotsize = st.slider("Plot Size", 1, 20, 3, 1)
+    if mode != "Visualize Diagonal Dynamics":
+        plotsize = st.slider("Plot Size", 1, 20, 3, 1, key="plotsize_top")
+    else:
+        plotsize = 3  # not used in this mode
 
 
 # =========================
@@ -439,10 +448,10 @@ if mode == "Plot Orbit":
     col1, col2 = st.columns(2)
 
     with col1:
-        iters = st.slider("Iterations", 10, 5000, 2000, 10)
+        iters = st.slider("Iterations", 10, 5000, 2000, 10, key="orbit_iters")
 
     with col2:
-        pointsize = st.slider("Point Size", 1, 10, 5, 1)
+        pointsize = st.slider("Point Size", 1, 10, 5, 1, key="orbit_pointsize")
 
     if st.button("Generate Orbit Plot", type="primary", use_container_width=True):
         fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
@@ -459,31 +468,31 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        iters = st.slider("Animation Iterations", 1, 100, 20, 1)
+        iters = st.slider("Animation Iterations", 1, 100, 20, 1, key="anim_iters")
 
     with col2:
-        duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50)
+        duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50, key="anim_duration")
 
     with col3:
         if mode == "Animate Folding (Centered)":
-            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25)
+            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25, key="centered_plotsize")
         else:
-            pointsize = st.slider("Point Size", 1, 10, 2, 1)
+            pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        orbit = st.checkbox("Show Orbit Background", value=False)
+        orbit = st.checkbox("Show Orbit Background", value=False, key="anim_orbit")
 
     with col2:
         iters_orbit = (
-            st.slider("Orbit Iterations", 100, 5000, 2000, 100)
+            st.slider("Orbit Iterations", 100, 5000, 2000, 100, key="anim_orbit_iters")
             if orbit else 2000
         )
 
     with col3:
         alpha_orbit = (
-            st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05)
+            st.slider("Orbit Transparency", 0.0, 1.0, 0.3, 0.05, key="anim_alpha_orbit")
             if orbit else 0.3
         )
 
@@ -494,7 +503,7 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
         label = "Generate Centered Animation"
         func = animate_folding_centered
 
-    if st.button(label, type="primary", use_container_width=True):
+    if st.button(label, type="primary", use_container_width=True, key="anim_button"):
         html_anim = func(
             mu, nu, iters, duration,
             plotsize, pointsize if mode == "Animate Folding" else 2,
@@ -512,16 +521,13 @@ else:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01)
-    
+        iters = st.slider("Animation Iterations", 1, 200, 50, 1, key="dd_iters")
+
     with col2:
-        nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01)
-    
+        duration = st.slider("Frame Duration (ms)", 50, 1000, 300, 50, key="dd_duration")
+
     with col3:
-        if mode != "Visualize Diagonal Dynamics":
-            plotsize = st.slider("Plot Size", 1, 20, 3, 1)
-        else:
-            plotsize = 3  # unused default
+        quad_window = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 1.5, 0.25, key="dd_quad_window")
 
     if _dd_is_degenerate(mu, nu):
         st.warning(
@@ -529,6 +535,8 @@ else:
             "The rotation number is undefined and the circle panel will be hidden."
         )
 
-    if st.button("Generate Diagonal Dynamics", type="primary", use_container_width=True):
-        html_anim, degen = diagonal_dynamics_animation(mu, nu, iters, duration, quad_window)
-        st.components.v1.html(html_anim, height=600)
+    if st.button("Generate Diagonal Dynamics", type="primary", use_container_width=True, key="dd_button"):
+        html_anim, degen, render_height = diagonal_dynamics_animation(
+            mu, nu, iters, duration, quad_window
+        )
+        st.components.v1.html(html_anim, height=render_height)
