@@ -6,32 +6,7 @@ from scipy import integrate
 
 st.set_page_config(page_title="Iterated Folding Visualizer", layout="wide")
 
-# Force light mode regardless of device/browser settings
-st.markdown("""
-    <style>
-        html, body,
-        [data-testid="stAppViewContainer"],
-        [data-testid="stApp"],
-        [data-testid="stMain"],
-        .main { 
-            background-color: white !important;
-            color: black !important;
-        }
-        [data-testid="stSidebar"] { background-color: #f8f8f8 !important; }
-        @media (prefers-color-scheme: dark) {
-            html, body,
-            [data-testid="stAppViewContainer"],
-            [data-testid="stApp"],
-            [data-testid="stMain"],
-            .main {
-                background-color: white !important;
-                color: black !important;
-            }
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-st.title("Iterated Folding Visualizer")
+st.title("Cyclic Folding")
 
 
 # =========================
@@ -537,13 +512,16 @@ else:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        iters = st.slider("Animation Iterations", 1, 200, 50, 1)
-
+        mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01)
+    
     with col2:
-        duration = st.slider("Frame Duration (ms)", 50, 1000, 300, 50)
-
+        nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01)
+    
     with col3:
-        quad_window = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 1.5, 0.25)
+        if mode != "Visualize Diagonal Dynamics":
+            plotsize = st.slider("Plot Size", 1, 20, 3, 1)
+        else:
+            plotsize = 3  # unused default
 
     if _dd_is_degenerate(mu, nu):
         st.warning(
