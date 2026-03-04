@@ -389,7 +389,7 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
 
         if not degenerate:
             ax_circle.clear()
-            draw_fading_path(ax_circle, circle_pts[:, 0], circle_pts[:, 1], i)
+            draw_fading_path(ax_circle, circle_pts[:i+1, 0], circle_pts[:i+1, 1], i)
             circle_patch = plt.Circle((0, 0), 1, fill=False, color="black",
                                       linewidth=1.5, zorder=3)
             ax_circle.add_patch(circle_patch)
