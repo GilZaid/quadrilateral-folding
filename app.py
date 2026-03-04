@@ -331,12 +331,13 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
     Z = F(X, Y)
 
     if not degenerate:
-        circle_pts = []
+        circle_pts_list = []
         theta = 0
         for i in range(iters + 1):
-            circle_pts.append((np.cos(theta), np.sin(theta)))
+            circle_pts_list.append((np.cos(theta), np.sin(theta)))
             if i % 2 == 1:
                 theta += theta_step
+        circle_pts = np.array(circle_pts_list)  # shape: (iters+1, 2)
 
     n_panels = 2 if degenerate else 3
 
