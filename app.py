@@ -341,7 +341,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
 
     n_panels = 2 if degenerate else 3
 
-    # dpi=80, 5.5in per panel → each panel ~440px wide, figure ~440px tall
     dpi = 80
     fig_w = 5.5 * n_panels
     fig_h = 5.5
@@ -407,7 +406,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
                          interval=duration_ms, repeat=True)
     plt.close()
 
-    # fig pixel height + generous buffer for jshtml controls (slider, buttons)
     render_height = int(fig_h * dpi) + 280
     return anim.to_jshtml(), degenerate, render_height
 
@@ -417,7 +415,6 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
 # =========================
 
 def show_animation(html_str, height_px):
-    """Wrap jshtml in a centered div and render in an iframe tall enough to avoid clipping."""
     wrapped = f"""
     <div style="display:flex; justify-content:center; padding-top:16px;">
       {html_str}
@@ -441,10 +438,26 @@ mode = st.radio(
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    mu = st.slider("μ (mu)", 0.0, 1.0, 0.3, 0.01, key="mu_top")
+    mu_input = st.text_input("μ (mu)", value="0.3", key="mu_top")
+    try:
+        mu = float(mu_input)
+        if not (0.0 <= mu <= 1.0):
+            st.error("μ must be between 0 and 1.")
+            mu = None
+    except ValueError:
+        st.error("μ must be a valid number.")
+        mu = None
 
 with col2:
-    nu = st.slider("ν (nu)", 0.0, 1.0, 0.4, 0.01, key="nu_top")
+    nu_input = st.text_input("ν (nu)", value="0.4", key="nu_top")
+    try:
+        nu = float(nu_input)
+        if not (0.0 <= nu <= 1.0):
+            st.error("ν must be between 0 and 1.")
+            nu = None
+    except ValueError:
+        st.error("ν must be a valid number.")
+        nu = None
 
 with col3:
     if mode != "Visualize Diagonal Dynamics":
@@ -467,7 +480,7 @@ if mode == "Plot Orbit":
     with col2:
         pointsize = st.slider("Point Size", 1, 10, 5, 1, key="orbit_pointsize")
 
-    if st.button("Generate Orbit Plot", type="primary", use_container_width=True):
+    if st.button("Generate Orbit Plot", type="primary", use_container_width=True) and mu is not None and nu is not None:
         fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
         buf_col1, buf_col2, buf_col3 = st.columns([1, 2.5, 1])
         with buf_col2:
@@ -490,7 +503,10 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
         duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50, key="anim_duration")
 
     with col3:
-        pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
+        if mode == "Animate Folding (Centered)":
+            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25, key="centered_plotsize")
+        else:
+            pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
 
     col1, col2, col3 = st.columns(3)
 
@@ -516,13 +532,12 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
         label = "Generate Centered Animation"
         func = animate_folding_centered
 
-    if st.button(label, type="primary", use_container_width=True, key="anim_button"):
+    if st.button(label, type="primary", use_container_width=True, key="anim_button") and mu is not None and nu is not None:
         html_anim = func(
             mu, nu, iters, duration,
-            plotsize, pointsize,
+            plotsize, pointsize if mode == "Animate Folding" else 2,
             orbit, iters_orbit, alpha_orbit
         )
-        # figure is 7x7 at dpi=80 → 560px; controls add ~130px; padding adds 16px
         show_animation(html_anim, height_px=720)
 
 
@@ -543,13 +558,13 @@ else:
     with col3:
         quad_window = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 1.5, 0.25, key="dd_quad_window")
 
-    if _dd_is_degenerate(mu, nu):
+    if mu is not None and nu is not None and _dd_is_degenerate(mu, nu):
         st.warning(
             "Degenerate case detected (μ + ν = 1 or μ = ν). "
             "The rotation number is undefined and the circle panel will be hidden."
         )
 
-    if st.button("Generate Diagonal Dynamics", type="primary", use_container_width=True, key="dd_button"):
+    if st.button("Generate Diagonal Dynamics", type="primary", use_container_width=True, key="dd_button") and mu is not None and nu is not None:
         html_anim, degen, render_height = diagonal_dynamics_animation(
             mu, nu, iters, duration, quad_window
         )
