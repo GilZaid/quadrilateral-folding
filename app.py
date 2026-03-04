@@ -58,8 +58,6 @@ def plot_orbit_to_image(mu, nu, iters, plotsize, pointsize=5):
     ax.set_xlim(-plotsize, plotsize)
     ax.set_ylim(-plotsize, plotsize)
 
-    ax.set_xlabel("Real")
-    ax.set_ylabel("Imaginary")
     ax.set_title(f"Orbit over {iters} iterations (μ={mu}, ν={nu})", pad=12)
 
     return fig
@@ -100,7 +98,7 @@ def animate_folding(
         v0, v1, v2, v3 = fold(v0, v1, v2, v3)
         frames.append((v0, v1, v2, v3))
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(7, 7), dpi=80)
     fig.subplots_adjust(top=0.92)
 
     def update(frame_num):
@@ -179,7 +177,7 @@ def animate_folding_centered(
         v0, v1, v2, v3 = fold_centered(v0, v1, v2, v3)
         frames.append((v0, v1, v2, v3))
 
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(7, 7), dpi=80)
     fig.subplots_adjust(top=0.92)
 
     def update(frame_num):
@@ -343,10 +341,10 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
 
     n_panels = 2 if degenerate else 3
 
-    # Scale 0.8: each panel 4 inches wide x 4 tall
-    fig_w = 4 * n_panels
-    fig_h = 4
-    dpi = 100
+    # dpi=80, 5.5in per panel → each panel ~440px wide, figure ~440px tall
+    dpi = 80
+    fig_w = 5.5 * n_panels
+    fig_h = 5.5
     fig, axes = plt.subplots(1, n_panels, figsize=(fig_w, fig_h), dpi=dpi)
     fig.subplots_adjust(left=0.06, right=0.97, top=0.88, bottom=0.08, wspace=0.35)
 
@@ -409,9 +407,23 @@ def diagonal_dynamics_animation(mu, nu, iters, duration_ms, quad_window=1.5, res
                          interval=duration_ms, repeat=True)
     plt.close()
 
-    # pixel height of figure + buffer for jshtml controls
-    render_height = int(fig_h * dpi) + 220
+    # fig pixel height + generous buffer for jshtml controls (slider, buttons)
+    render_height = int(fig_h * dpi) + 280
     return anim.to_jshtml(), degenerate, render_height
+
+
+# =========================
+# Shared helper: centered iframe
+# =========================
+
+def show_animation(html_str, height_px):
+    """Wrap jshtml in a centered div and render in an iframe tall enough to avoid clipping."""
+    wrapped = f"""
+    <div style="display:flex; justify-content:center; padding-top:16px;">
+      {html_str}
+    </div>
+    """
+    st.components.v1.html(wrapped, height=height_px, scrolling=False)
 
 
 # =========================
@@ -438,18 +450,7 @@ with col3:
     if mode != "Visualize Diagonal Dynamics":
         plotsize = st.slider("Plot Size", 1, 20, 3, 1, key="plotsize_top")
     else:
-        plotsize = 3  # not used in this mode
-
-
-# helper: render jshtml centered with correct height
-def show_animation(html_str, fig_height_px):
-    # Add top padding and center via a wrapping div
-    wrapped = f"""
-    <div style="display:flex; justify-content:center; padding-top:20px;">
-      {html_str}
-    </div>
-    """
-    st.components.v1.html(wrapped, height=fig_height_px)
+        plotsize = 3
 
 
 # =========================
@@ -468,7 +469,6 @@ if mode == "Plot Orbit":
 
     if st.button("Generate Orbit Plot", type="primary", use_container_width=True):
         fig = plot_orbit_to_image(mu, nu, iters, plotsize, pointsize)
-        # Scale down by 0.6 and center
         buf_col1, buf_col2, buf_col3 = st.columns([1, 2.5, 1])
         with buf_col2:
             st.pyplot(fig, use_container_width=True)
@@ -525,8 +525,8 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
             plotsize, pointsize if mode == "Animate Folding" else 2,
             orbit, iters_orbit, alpha_orbit
         )
-        # fig is 5x5 at 100dpi = 500px tall; add buffer for controls
-        show_animation(html_anim, fig_height_px=560)
+        # figure is 7x7 at dpi=80 → 560px; controls add ~130px; padding adds 16px
+        show_animation(html_anim, height_px=720)
 
 
 # =========================
@@ -556,4 +556,4 @@ else:
         html_anim, degen, render_height = diagonal_dynamics_animation(
             mu, nu, iters, duration, quad_window
         )
-        show_animation(html_anim, fig_height_px=render_height)
+        show_animation(html_anim, height_px=render_height)
