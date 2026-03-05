@@ -495,19 +495,13 @@ if mode == "Plot Orbit":
 
 elif mode in ("Animate Folding", "Animate Folding (Centered)"):
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
     with col1:
         iters = st.slider("Animation Iterations", 1, 100, 20, 1, key="anim_iters")
 
     with col2:
         duration = st.slider("Frame Duration (ms)", 50, 1000, 200, 50, key="anim_duration")
-
-    with col3:
-        if mode == "Animate Folding (Centered)":
-            plotsize = st.slider("Quadrilateral Plot Size", 1.0, 3.0, 2.0, 0.25, key="centered_plotsize")
-        else:
-            pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
 
     col1, col2, col3 = st.columns(3)
 
@@ -526,6 +520,11 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
             if orbit else 0.3
         )
 
+    if orbit:
+        pointsize = st.slider("Point Size", 1, 10, 2, 1, key="anim_pointsize")
+    else:
+        pointsize = 2
+
     if mode == "Animate Folding":
         label = "Generate Animation"
         func = animate_folding
@@ -536,7 +535,7 @@ elif mode in ("Animate Folding", "Animate Folding (Centered)"):
     if st.button(label, type="primary", use_container_width=True, key="anim_button") and mu is not None and nu is not None:
         html_anim = func(
             mu, nu, iters, duration,
-            plotsize, pointsize if mode == "Animate Folding" else 2,
+            plotsize, pointsize,
             orbit, iters_orbit, alpha_orbit
         )
         show_animation(html_anim, height_px=720)
