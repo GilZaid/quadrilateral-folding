@@ -462,7 +462,15 @@ with col2:
 
 with col3:
     if mode != "Visualize Diagonal Dynamics":
-        plotsize = st.slider("Plot Size", 1, 20, 3, 1, key="plotsize_top")
+        plotsize_input = st.text_input("Plot Size", value="2", key="plotsize_top")
+        try:
+            plotsize = float(plotsize_input)
+            if plotsize <= 0:
+                st.error("Plot size must be positive.")
+                plotsize = 2.0
+        except ValueError:
+            st.error("Plot size must be a number.")
+            plotsize = 2.0
     else:
         plotsize = 3
 
